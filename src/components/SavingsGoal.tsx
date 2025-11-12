@@ -156,6 +156,7 @@ export const SavingsGoal = () => {
       <div className="grid gap-4 md:grid-cols-2">
         {goals.map((goal, index) => {
           const progress = (goal.current / goal.target) * 100;
+          const isCompleted = goal.current >= goal.target;
           return (
             <Card
               key={index}
@@ -195,50 +196,61 @@ export const SavingsGoal = () => {
                   </div>
                 </div>
 
-                <div className="space-y-3">
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      onClick={() => addToGoal(index, 100)}
-                      className="flex-1 bg-primary hover:bg-primary/90"
-                    >
-                      +$100
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={() => addToGoal(index, 500)}
-                      className="flex-1 bg-secondary hover:bg-secondary/90"
-                    >
-                      +$500
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={() => addToGoal(index, 1000)}
-                      className="flex-1 bg-accent hover:bg-accent/90"
-                    >
-                      +$1000
-                    </Button>
+                {isCompleted ? (
+                  <div className="text-center py-4 space-y-2">
+                    <p className="text-lg font-semibold text-primary">
+                      🎉 ¡Meta Alcanzada!
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Has completado esta meta de ahorro exitosamente
+                    </p>
                   </div>
-                  <div className="flex gap-2">
-                    <Input
-                      type="number"
-                      placeholder="Otro monto..."
-                      value={customAmounts[index] || ""}
-                      onChange={(e) =>
-                        setCustomAmounts({ ...customAmounts, [index]: e.target.value })
-                      }
-                      className="flex-1"
-                    />
-                    <Button
-                      size="sm"
-                      onClick={() => addCustomAmount(index)}
-                      variant="outline"
-                      className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
-                    >
-                      Agregar
-                    </Button>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        onClick={() => addToGoal(index, 100)}
+                        className="flex-1 bg-primary hover:bg-primary/90"
+                      >
+                        +$100
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => addToGoal(index, 500)}
+                        className="flex-1 bg-secondary hover:bg-secondary/90"
+                      >
+                        +$500
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => addToGoal(index, 1000)}
+                        className="flex-1 bg-accent hover:bg-accent/90"
+                      >
+                        +$1000
+                      </Button>
+                    </div>
+                    <div className="flex gap-2">
+                      <Input
+                        type="number"
+                        placeholder="Otro monto..."
+                        value={customAmounts[index] || ""}
+                        onChange={(e) =>
+                          setCustomAmounts({ ...customAmounts, [index]: e.target.value })
+                        }
+                        className="flex-1"
+                      />
+                      <Button
+                        size="sm"
+                        onClick={() => addCustomAmount(index)}
+                        variant="outline"
+                        className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                      >
+                        Agregar
+                      </Button>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </Card>
           );
