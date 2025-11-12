@@ -27,14 +27,14 @@ const Index = () => {
             <MotivationalMessage />
           </div>
 
-          {/* Calendar */}
+          {/* Goals */}
           <div className="animate-fade-in" style={{ animationDelay: "0.2s" }}>
-            <SavingsCalendar />
+            <SavingsGoal />
           </div>
 
-          {/* Goals */}
+          {/* Calendar */}
           <div className="animate-fade-in" style={{ animationDelay: "0.3s" }}>
-            <SavingsGoal />
+            <SavingsCalendar />
           </div>
         </div>
 
