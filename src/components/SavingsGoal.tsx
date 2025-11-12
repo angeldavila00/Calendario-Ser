@@ -54,6 +54,8 @@ export const SavingsGoal = () => {
     toast.success("¡Meta agregada exitosamente!");
   };
 
+  const [customAmounts, setCustomAmounts] = useState<{ [key: number]: string }>({});
+
   const addToGoal = (index: number, amount: number) => {
     const updatedGoals = [...goals];
     updatedGoals[index].current = Math.min(
@@ -62,6 +64,16 @@ export const SavingsGoal = () => {
     );
     setGoals(updatedGoals);
     toast.success(`¡Agregaste $${amount} a tu meta!`);
+  };
+
+  const addCustomAmount = (index: number) => {
+    const amount = parseFloat(customAmounts[index] || "0");
+    if (amount <= 0 || isNaN(amount)) {
+      toast.error("Por favor ingresa un monto válido");
+      return;
+    }
+    addToGoal(index, amount);
+    setCustomAmounts({ ...customAmounts, [index]: "" });
   };
 
   return (
@@ -183,28 +195,49 @@ export const SavingsGoal = () => {
                   </div>
                 </div>
 
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    onClick={() => addToGoal(index, 100)}
-                    className="flex-1 bg-primary hover:bg-primary/90"
-                  >
-                    +$100
-                  </Button>
-                  <Button
-                    size="sm"
-                    onClick={() => addToGoal(index, 500)}
-                    className="flex-1 bg-secondary hover:bg-secondary/90"
-                  >
-                    +$500
-                  </Button>
-                  <Button
-                    size="sm"
-                    onClick={() => addToGoal(index, 1000)}
-                    className="flex-1 bg-accent hover:bg-accent/90"
-                  >
-                    +$1000
-                  </Button>
+                <div className="space-y-3">
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      onClick={() => addToGoal(index, 100)}
+                      className="flex-1 bg-primary hover:bg-primary/90"
+                    >
+                      +$100
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={() => addToGoal(index, 500)}
+                      className="flex-1 bg-secondary hover:bg-secondary/90"
+                    >
+                      +$500
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={() => addToGoal(index, 1000)}
+                      className="flex-1 bg-accent hover:bg-accent/90"
+                    >
+                      +$1000
+                    </Button>
+                  </div>
+                  <div className="flex gap-2">
+                    <Input
+                      type="number"
+                      placeholder="Otro monto..."
+                      value={customAmounts[index] || ""}
+                      onChange={(e) =>
+                        setCustomAmounts({ ...customAmounts, [index]: e.target.value })
+                      }
+                      className="flex-1"
+                    />
+                    <Button
+                      size="sm"
+                      onClick={() => addCustomAmount(index)}
+                      variant="outline"
+                      className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                    >
+                      Agregar
+                    </Button>
+                  </div>
                 </div>
               </div>
             </Card>
