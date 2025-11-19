@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import { Target, TrendingUp, Calendar, Trash2 } from "lucide-react";
+import { Target, TrendingUp, Calendar, Trash2, Pencil } from "lucide-react";
 import { toast } from "sonner";
 
 interface Goal {
@@ -29,7 +29,15 @@ export const SavingsGoal = () => {
   ]);
 
   const [isAdding, setIsAdding] = useState(false);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [newGoal, setNewGoal] = useState({
+    name: "",
+    target: "",
+    type: "short" as "short" | "long",
+    startDate: "",
+    deadline: "",
+  });
+  const [editGoal, setEditGoal] = useState({
     name: "",
     target: "",
     type: "short" as "short" | "long",
@@ -108,6 +116,55 @@ export const SavingsGoal = () => {
     const updatedGoals = goals.filter((_, i) => i !== index);
     setGoals(updatedGoals);
     toast.success("Meta eliminada");
+  };
+
+  const startEditing = (index: number) => {
+    const goal = goals[index];
+    setEditGoal({
+      name: goal.name,
+      target: goal.target.toString(),
+      type: goal.type,
+      startDate: goal.startDate,
+      deadline: goal.deadline,
+    });
+    setEditingIndex(index);
+    setIsAdding(false);
+  };
+
+  const saveEdit = () => {
+    if (!editGoal.name || !editGoal.target || !editGoal.startDate || !editGoal.deadline) {
+      toast.error("Por favor completa todos los campos");
+      return;
+    }
+
+    if (new Date(editGoal.startDate) >= new Date(editGoal.deadline)) {
+      toast.error("La fecha de inicio debe ser anterior a la fecha de finalización");
+      return;
+    }
+
+    const updatedGoals = [...goals];
+    updatedGoals[editingIndex!] = {
+      ...updatedGoals[editingIndex!],
+      name: editGoal.name,
+      target: parseFloat(editGoal.target),
+      type: editGoal.type,
+      startDate: editGoal.startDate,
+      deadline: editGoal.deadline,
+    };
+    setGoals(updatedGoals);
+    setEditingIndex(null);
+    toast.success("¡Meta actualizada exitosamente!");
+  };
+
+  const cancelEdit = () => {
+    setEditingIndex(null);
+    setEditGoal({
+      name: "",
+      target: "",
+      type: "short",
+      startDate: "",
+      deadline: "",
+    });
   };
 
   return (
@@ -200,6 +257,89 @@ export const SavingsGoal = () => {
         {goals.map((goal, index) => {
           const progress = (goal.current / goal.target) * 100;
           const isCompleted = goal.current >= goal.target;
+          const isEditing = editingIndex === index;
+          
+          if (isEditing) {
+            return (
+              <Card
+                key={index}
+                className="p-6 border-primary/20 animate-fade-in"
+              >
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-lg text-foreground">Editar Meta</h3>
+                  <div>
+                    <Label htmlFor={`edit-name-${index}`}>Nombre de la meta</Label>
+                    <Input
+                      id={`edit-name-${index}`}
+                      value={editGoal.name}
+                      onChange={(e) => setEditGoal({ ...editGoal, name: e.target.value })}
+                      placeholder="Ej: Vacaciones, Auto nuevo..."
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor={`edit-target-${index}`}>Monto objetivo</Label>
+                    <Input
+                      id={`edit-target-${index}`}
+                      type="number"
+                      value={editGoal.target}
+                      onChange={(e) => setEditGoal({ ...editGoal, target: e.target.value })}
+                      placeholder="5000"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor={`edit-startDate-${index}`}>Fecha de inicio</Label>
+                      <Input
+                        id={`edit-startDate-${index}`}
+                        type="date"
+                        value={editGoal.startDate}
+                        onChange={(e) => setEditGoal({ ...editGoal, startDate: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor={`edit-deadline-${index}`}>Fecha de finalización</Label>
+                      <Input
+                        id={`edit-deadline-${index}`}
+                        type="date"
+                        value={editGoal.deadline}
+                        onChange={(e) => setEditGoal({ ...editGoal, deadline: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label>Tipo de meta</Label>
+                    <div className="flex gap-2 mt-2">
+                      <Button
+                        type="button"
+                        variant={editGoal.type === "short" ? "default" : "outline"}
+                        onClick={() => setEditGoal({ ...editGoal, type: "short" })}
+                        className="flex-1"
+                      >
+                        Corto Plazo
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={editGoal.type === "long" ? "default" : "outline"}
+                        onClick={() => setEditGoal({ ...editGoal, type: "long" })}
+                        className="flex-1"
+                      >
+                        Largo Plazo
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button onClick={saveEdit} className="flex-1 bg-primary hover:bg-primary/90">
+                      Guardar Cambios
+                    </Button>
+                    <Button onClick={cancelEdit} variant="outline" className="flex-1">
+                      Cancelar
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            );
+          }
+          
           return (
             <Card
               key={index}
@@ -230,6 +370,14 @@ export const SavingsGoal = () => {
                     >
                       {goal.type === "short" ? "Corto" : "Largo"} Plazo
                     </span>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => startEditing(index)}
+                      className="h-8 w-8 p-0 text-primary hover:text-primary hover:bg-primary/10"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </Button>
                     <Button
                       size="sm"
                       variant="ghost"
