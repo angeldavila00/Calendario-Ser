@@ -12,6 +12,7 @@ interface Goal {
   target: number;
   current: number;
   type: "short" | "long";
+  startDate: string;
   deadline: string;
 }
 
@@ -22,6 +23,7 @@ export const SavingsGoal = () => {
       target: 5000,
       current: 1200,
       type: "short",
+      startDate: "2025-01-01",
       deadline: "2025-06-30",
     },
   ]);
@@ -31,12 +33,18 @@ export const SavingsGoal = () => {
     name: "",
     target: "",
     type: "short" as "short" | "long",
+    startDate: "",
     deadline: "",
   });
 
   const addGoal = () => {
-    if (!newGoal.name || !newGoal.target || !newGoal.deadline) {
+    if (!newGoal.name || !newGoal.target || !newGoal.startDate || !newGoal.deadline) {
       toast.error("Por favor completa todos los campos");
+      return;
+    }
+
+    if (new Date(newGoal.startDate) >= new Date(newGoal.deadline)) {
+      toast.error("La fecha de inicio debe ser anterior a la fecha de finalización");
       return;
     }
 
@@ -49,7 +57,7 @@ export const SavingsGoal = () => {
       },
     ]);
 
-    setNewGoal({ name: "", target: "", type: "short", deadline: "" });
+    setNewGoal({ name: "", target: "", type: "short", startDate: "", deadline: "" });
     setIsAdding(false);
     toast.success("¡Meta agregada exitosamente!");
   };
@@ -130,19 +138,28 @@ export const SavingsGoal = () => {
                 placeholder="Ej: Vacaciones, Auto nuevo..."
               />
             </div>
+            <div>
+              <Label htmlFor="target">Monto objetivo</Label>
+              <Input
+                id="target"
+                type="number"
+                value={newGoal.target}
+                onChange={(e) => setNewGoal({ ...newGoal, target: e.target.value })}
+                placeholder="5000"
+              />
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="target">Monto objetivo</Label>
+                <Label htmlFor="startDate">Fecha de inicio</Label>
                 <Input
-                  id="target"
-                  type="number"
-                  value={newGoal.target}
-                  onChange={(e) => setNewGoal({ ...newGoal, target: e.target.value })}
-                  placeholder="5000"
+                  id="startDate"
+                  type="date"
+                  value={newGoal.startDate}
+                  onChange={(e) => setNewGoal({ ...newGoal, startDate: e.target.value })}
                 />
               </div>
               <div>
-                <Label htmlFor="deadline">Fecha límite</Label>
+                <Label htmlFor="deadline">Fecha de finalización</Label>
                 <Input
                   id="deadline"
                   type="date"
@@ -192,9 +209,15 @@ export const SavingsGoal = () => {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <h3 className="font-semibold text-lg text-foreground">{goal.name}</h3>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
-                      <Calendar className="w-4 h-4" />
-                      {new Date(goal.deadline).toLocaleDateString("es-ES")}
+                    <div className="flex flex-col gap-1 text-sm text-muted-foreground mt-1">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4" />
+                        <span>Inicio: {new Date(goal.startDate).toLocaleDateString("es-ES")}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4" />
+                        <span>Fin: {new Date(goal.deadline).toLocaleDateString("es-ES")}</span>
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
