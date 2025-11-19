@@ -66,6 +66,16 @@ export const SavingsGoal = () => {
     toast.success(`¡Agregaste $${amount} a tu meta!`);
   };
 
+  const subtractFromGoal = (index: number, amount: number) => {
+    const updatedGoals = [...goals];
+    updatedGoals[index].current = Math.max(
+      updatedGoals[index].current - amount,
+      0
+    );
+    setGoals(updatedGoals);
+    toast.success(`Restaste $${amount} de tu meta`);
+  };
+
   const addCustomAmount = (index: number) => {
     const amount = parseFloat(customAmounts[index] || "0");
     if (amount <= 0 || isNaN(amount)) {
@@ -73,6 +83,16 @@ export const SavingsGoal = () => {
       return;
     }
     addToGoal(index, amount);
+    setCustomAmounts({ ...customAmounts, [index]: "" });
+  };
+
+  const subtractCustomAmount = (index: number) => {
+    const amount = parseFloat(customAmounts[index] || "0");
+    if (amount <= 0 || isNaN(amount)) {
+      toast.error("Por favor ingresa un monto válido");
+      return;
+    }
+    subtractFromGoal(index, amount);
     setCustomAmounts({ ...customAmounts, [index]: "" });
   };
 
@@ -207,28 +227,60 @@ export const SavingsGoal = () => {
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        onClick={() => addToGoal(index, 100)}
-                        className="flex-1 bg-primary hover:bg-primary/90"
-                      >
-                        +$100
-                      </Button>
-                      <Button
-                        size="sm"
-                        onClick={() => addToGoal(index, 500)}
-                        className="flex-1 bg-secondary hover:bg-secondary/90"
-                      >
-                        +$500
-                      </Button>
-                      <Button
-                        size="sm"
-                        onClick={() => addToGoal(index, 1000)}
-                        className="flex-1 bg-accent hover:bg-accent/90"
-                      >
-                        +$1000
-                      </Button>
+                    <div className="space-y-2">
+                      <p className="text-xs font-medium text-muted-foreground">Agregar</p>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          onClick={() => addToGoal(index, 100)}
+                          className="flex-1 bg-primary hover:bg-primary/90"
+                        >
+                          +$100
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={() => addToGoal(index, 500)}
+                          className="flex-1 bg-secondary hover:bg-secondary/90"
+                        >
+                          +$500
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={() => addToGoal(index, 1000)}
+                          className="flex-1 bg-accent hover:bg-accent/90"
+                        >
+                          +$1000
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-xs font-medium text-muted-foreground">Restar</p>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          onClick={() => subtractFromGoal(index, 100)}
+                          variant="outline"
+                          className="flex-1 border-destructive/50 text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                        >
+                          -$100
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={() => subtractFromGoal(index, 500)}
+                          variant="outline"
+                          className="flex-1 border-destructive/50 text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                        >
+                          -$500
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={() => subtractFromGoal(index, 1000)}
+                          variant="outline"
+                          className="flex-1 border-destructive/50 text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                        >
+                          -$1000
+                        </Button>
+                      </div>
                     </div>
                     <div className="flex gap-2">
                       <Input
@@ -247,6 +299,14 @@ export const SavingsGoal = () => {
                         className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
                       >
                         Agregar
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => subtractCustomAmount(index)}
+                        variant="outline"
+                        className="border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                      >
+                        Restar
                       </Button>
                     </div>
                   </div>
