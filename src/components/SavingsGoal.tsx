@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import { Target, TrendingUp, Calendar } from "lucide-react";
+import { Target, TrendingUp, Calendar, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface Goal {
@@ -96,6 +96,12 @@ export const SavingsGoal = () => {
     setCustomAmounts({ ...customAmounts, [index]: "" });
   };
 
+  const deleteGoal = (index: number) => {
+    const updatedGoals = goals.filter((_, i) => i !== index);
+    setGoals(updatedGoals);
+    toast.success("Meta eliminada");
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -184,22 +190,32 @@ export const SavingsGoal = () => {
             >
               <div className="space-y-4">
                 <div className="flex items-start justify-between">
-                  <div>
+                  <div className="flex-1">
                     <h3 className="font-semibold text-lg text-foreground">{goal.name}</h3>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                       <Calendar className="w-4 h-4" />
                       {new Date(goal.deadline).toLocaleDateString("es-ES")}
                     </div>
                   </div>
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      goal.type === "short"
-                        ? "bg-secondary/20 text-secondary"
-                        : "bg-accent/20 text-accent"
-                    }`}
-                  >
-                    {goal.type === "short" ? "Corto" : "Largo"} Plazo
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        goal.type === "short"
+                          ? "bg-secondary/20 text-secondary"
+                          : "bg-accent/20 text-accent"
+                      }`}
+                    >
+                      {goal.type === "short" ? "Corto" : "Largo"} Plazo
+                    </span>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => deleteGoal(index)}
+                      className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="space-y-2">
